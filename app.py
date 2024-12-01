@@ -1,7 +1,7 @@
 import os
 import time
 import pickle
-import faiss-cpu
+import faiss
 import numpy as np
 import streamlit as st
 from sentence_transformers import SentenceTransformer
