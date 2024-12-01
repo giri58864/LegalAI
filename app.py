@@ -22,7 +22,7 @@ model = genai.GenerativeModel("gemini-1.5-flash")
 embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
 
 # Streamlit app setup
-st.title("AI Legal Document Assistant")
+st.title("AI legal Document Assistant")
 
 # Initialize session state for chat history and document analysis
 if "messages" not in st.session_state:
@@ -55,16 +55,10 @@ def split_text_into_chunks(text, max_length=500):
 def detect_important_dates_with_llm(text):
     print("Detecting important dates...")
     prompt = f"""
-    Please analyze the following contract text and identify all important dates, such as:
-    - Expiration dates of the contract,
-    - Renewal dates,
-    - Payment deadlines,
-    - Notice periods,
-    - Any other time-sensitive clauses,etc.
+    Please analyze the following contract text and identify all important dates
+    Provide a concise list of dates with a brief explanation of their significance in the contract or any action to be taken.
 
-    Provide a concise list of dates with a brief explanation of their significance in the contract.
-
-    Contract text: {text}  # Include a snippet of the contract text for context
+    Contract text: {text}
     """
     response = model.generate_content(prompt)
     print("Important dates detection completed.")
@@ -185,7 +179,9 @@ def retrieve_from_embeddings(user_query, contract_chunks, top_k=5):
 def analyze_document(pdf_text):
     print("Starting document analysis...")
     # Step 1: Identify and classify clauses in the document
-    prompt_for_clauses = f"Please analyze the following contract text and identify key clauses (e.g., termination, indemnity, confidentiality, etc.). Please provide a concise summary for each clause:\n\n{pdf_text}"
+    prompt_for_clauses = f"""Please analyze the following contract text and
+    identifie and classify clauses in the provided legal contract
+    Please provide a concise summary for each clause:\n\n{pdf_text}"""
     response_for_clauses = model.generate_content(prompt_for_clauses)
     clauses_analysis = response_for_clauses.text
 
@@ -226,12 +222,11 @@ with tab1:
                             st.markdown(f"**{flagged['term'].capitalize()}**: {flagged['explanation'].split('.')[0]}")  # Limit explanation length for ease of reading
                             st.markdown(f"  **Recommendation**: {flagged['explanation'].split('.')[1] if '.' in flagged['explanation'] else 'Revise clause for clarity and fairness.'}")
 
-
                 if important_dates_analysis:
                     with st.expander("## Important Dates"):
                         st.write(important_dates_analysis)
                 print("Document analysis completed.")
-                
+
 
             except Exception as e:
                 print(f"Error during document analysis: {e}")
